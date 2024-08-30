@@ -1,4 +1,4 @@
-package main
+package feeds
 
 import (
 	"encoding/xml"
@@ -28,7 +28,7 @@ type Item struct {
 	PubDate     time.Time `xml:"pubDate"`
 }
 
-func generateRssFeed() RSS {
+func GenerateRssFeed() RSS {
 	numberOfItems := gofakeit.Number(10, 25)
 
 	items := []Item{}
