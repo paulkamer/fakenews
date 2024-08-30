@@ -10,7 +10,7 @@
 - [x] Add endpoints for semi-invalid responses
   - [x] RSS response but with Atom header and vice versa
   - [x] RSS response but with HTML header
-- [ ] Add endpoints for invalid responses
+- [x] Add endpoints for invalid responses
   - [x] HTML (error page or whatever) returned as RSS
-  - [ ] Malformed XML
+  - [x] Malformed XML
 - [x] Support Atom 1.0
