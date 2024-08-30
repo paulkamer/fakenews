@@ -5,6 +5,12 @@
 - https://en.wikipedia.org/wiki/RSS
 - https://en.wikipedia.org/wiki/Atom_(web_standard)
 
+Serves HTTPS on port `8443`. Generate a self-signed certificate with:
+
+```sh
+openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -nodes
+```
+
 ## TODO
 
 - [x] Add endpoints for semi-invalid responses

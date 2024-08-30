@@ -2,6 +2,7 @@ package main
 
 import (
 	"fakenews/feeds"
+	"log"
 	"net/http"
 	"os"
 
@@ -61,5 +62,8 @@ func main() {
 		})
 	}
 
-	r.Run()
+	err := r.RunTLS(":8443", "cert.pem", "key.pem")
+	if err != nil {
+		log.Fatalf("Failed to run server: %v", err)
+	}
 }
