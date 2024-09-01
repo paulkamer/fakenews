@@ -20,3 +20,6 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -node
   - [x] HTML (error page or whatever) returned as RSS
   - [x] Malformed XML
 - [x] Support Atom 1.0
+- [ ] Responses with wrong/unexpected status codes
+- [ ] Weird redirects
+- [ ] http -> https and vice versa
