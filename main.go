@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -61,6 +62,40 @@ func main() {
 			c.String(http.StatusOK, string(content))
 		})
 	}
+
+	redirects := r.Group("/redirects")
+	{
+		redirects.GET("/rss/valid", func(c *gin.Context) {
+			time.Sleep(1 * time.Second)
+
+			c.Redirect(http.StatusTemporaryRedirect, "/valid/rss")
+		})
+
+		redirects.GET("/multiple", func(c *gin.Context) {
+			time.Sleep(1 * time.Second)
+
+			c.Redirect(http.StatusTemporaryRedirect, "/redirects/rss/valid")
+		})
+
+		redirects.GET("/https/to/http", func(c *gin.Context) {
+			time.Sleep(1 * time.Second)
+
+			c.Redirect(http.StatusTemporaryRedirect, "http://127.0.0.1:8080/valid/rss")
+		})
+
+		redirects.GET("/http/to/https", func(c *gin.Context) {
+			time.Sleep(1 * time.Second)
+
+			c.Redirect(http.StatusTemporaryRedirect, "https://127.0.0.1:8443/valid/rss")
+		})
+	}
+
+	go func() {
+		err_http := http.ListenAndServe(":8080", r)
+		if err_http != nil {
+			log.Fatal("Web server (HTTP): ", err_http)
+		}
+	}()
 
 	err := r.RunTLS(":8443", "cert.pem", "key.pem")
 	if err != nil {
