@@ -1,9 +1,10 @@
 # Fake news generator
 
-- https://gin-gonic.com/
-- https://github.com/brianvoe/gofakeit
-- https://en.wikipedia.org/wiki/RSS
-- https://en.wikipedia.org/wiki/Atom_(web_standard)
+Fake/dummy RSS/ATOM feed generator, for testing purposes.
+
+## Usage
+
+
 
 Serves HTTPS on port `8443`. Generate a self-signed certificate with:
 
@@ -22,4 +23,13 @@ openssl req -x509 -newkey rsa:4096 -keyout key.pem -out cert.pem -days 365 -node
 - [x] Support Atom 1.0
 - [x] Weird redirects
 - [x] http -> https and vice versa
+- [x] Dockerize solution
 - [ ] Responses with wrong/unexpected status codes
+- [ ] Endpoint that randomly returns a vaid/semi-valid/invalid response
+
+## Useful links
+
+- https://gin-gonic.com/
+- https://github.com/brianvoe/gofakeit
+- https://en.wikipedia.org/wiki/RSS
+- https://en.wikipedia.org/wiki/Atom_(web_standard)
