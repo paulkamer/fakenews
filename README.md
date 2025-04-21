@@ -36,11 +36,10 @@ docker run -p 8080:8080 -p 8443:8443 fakenews:latest
 - [x] Weird redirects
 - [x] http -> https and vice versa
 - [x] Dockerize solution
-- [ ] Support Docker compose
-- [ ] Upgrade dependencies
-- [ ] Publish as Go module
-- [ ] Responses with wrong/unexpected status codes
 - [ ] Endpoint that randomly returns a vaid/semi-valid/invalid response
+- [ ] Support Docker compose
+- [ ] Responses with wrong/unexpected status codes
+- [ ] Publish as Go module
 
 ## Useful links
 
