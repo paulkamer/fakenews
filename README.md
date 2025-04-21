@@ -16,11 +16,13 @@ Save the `.pem` files in the same folder as `main.go`.
 
 Start with: `go run main.go`, or with [Air](https://github.com/air-verse/air), using simply: `air`.
 
-To run as a Docker container, run:
+To run as a Docker container with Docker Compose, run:
 
 ```sh
-docker build . -t fakenews:latest
+docker compose up -d
 
+# or with Docker:
+docker build . -t fakenews:latest
 docker run -p 8080:8080 -p 8443:8443 fakenews:latest
 ```
 
@@ -37,9 +39,9 @@ docker run -p 8080:8080 -p 8443:8443 fakenews:latest
 - [x] http -> https and vice versa
 - [x] Dockerize solution
 - [x] Endpoint that randomly returns a vaid/semi-valid/invalid response
-- [ ] Support Docker compose
-- [ ] Responses with wrong/unexpected status codes
+- [x] Support Docker compose
 - [ ] Publish as Go module
+- [ ] Responses with wrong/unexpected status codes
 
 ## Useful links
 
