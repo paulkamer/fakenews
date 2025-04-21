@@ -90,6 +90,19 @@ func main() {
 		})
 	}
 
+	// Random endpoint
+	// This endpoint will randomly select one of the defined endpoints and exectutes it (without redirecting)
+	r.GET("/random", func(c *gin.Context) {
+		var endpoints []string
+		for _, route := range r.Routes() {
+			endpoints = append(endpoints, route.Path)
+		}
+
+		randomEndpoint := endpoints[time.Now().UnixNano()%int64(len(endpoints))]
+		c.Request.URL.Path = randomEndpoint
+		r.HandleContext(c)
+	})
+
 	go func() {
 		err_http := http.ListenAndServe(":8080", r)
 		if err_http != nil {
