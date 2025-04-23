@@ -24,8 +24,6 @@ COPY --from=builder /app/fakenews .
 COPY --from=builder /app/*.pem ./
 COPY --from=builder /app/templates ./templates
 
-ENV GIN_MODE=release
-
 EXPOSE 8080
 EXPOSE 8443
 CMD ["./fakenews"]

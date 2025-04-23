@@ -40,6 +40,7 @@ docker run -p 8080:8080 -p 8443:8443 fakenews:latest
 - [x] Dockerize solution
 - [x] Endpoint that randomly returns a vaid/semi-valid/invalid response
 - [x] Support Docker compose
+- [x] Replace Gin
 - [ ] Publish as Go module
 - [ ] Responses with wrong/unexpected status codes
 
@@ -47,6 +48,6 @@ docker run -p 8080:8080 -p 8443:8443 fakenews:latest
 
 - https://en.wikipedia.org/wiki/RSS
 - https://en.wikipedia.org/wiki/Atom_(web_standard)
-- https://gin-gonic.com/
+- https://gofiber.io
 - https://github.com/brianvoe/gofakeit
 - https://github.com/air-verse/air

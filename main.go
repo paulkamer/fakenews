@@ -1,116 +1,139 @@
 package main
 
 import (
+	"encoding/xml"
 	"fakenews/feeds"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
-	"github.com/gin-gonic/gin"
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/template/html/v2"
 )
 
 func main() {
-	r := gin.Default()
-	r.LoadHTMLGlob("templates/*")
+	engine := html.New("./templates", ".tmpl")
 
-	valid := r.Group("/valid")
+	app := fiber.New(fiber.Config{
+		Views: engine,
+	})
+
+	valid := app.Group("/valid")
 	{
-		valid.GET("/rss", func(c *gin.Context) {
-			c.XML(http.StatusOK, feeds.GenerateRssFeed())
+		valid.Get("/rss", func(c *fiber.Ctx) error {
+			return c.XML(feeds.GenerateRssFeed())
 		})
 
-		valid.GET("/atom", func(c *gin.Context) {
-			c.XML(http.StatusOK, feeds.GenerateAtomFeed())
+		valid.Get("/atom", func(c *fiber.Ctx) error {
+			return c.XML(feeds.GenerateAtomFeed())
 		})
 	}
 
-	semiInvalid := r.Group("/semi-invalid")
+	semiInvalid := app.Group("/semi-invalid")
 	{
-		semiInvalid.GET("/rss/as-atom", func(c *gin.Context) {
-			c.Header("Content-Type", "application/atom+xml")
-			c.XML(http.StatusOK, feeds.GenerateRssFeed())
+		semiInvalid.Get("/rss/as-atom", func(c *fiber.Ctx) error {
+			c.Set("Content-Type", "application/atom+xml")
+
+			rssFeed := feeds.GenerateRssFeed()
+			rssFeedBytes, err := xml.Marshal(rssFeed)
+			if err != nil {
+				return c.Status(http.StatusInternalServerError).SendString("Failed to marshal RSS feed")
+			}
+			return c.Send(rssFeedBytes)
 		})
 
-		semiInvalid.GET("/rss/as-html", func(c *gin.Context) {
-			c.Header("Content-Type", "text/html")
-			c.XML(http.StatusOK, feeds.GenerateRssFeed())
+		semiInvalid.Get("/rss/as-html", func(c *fiber.Ctx) error {
+			c.Set("Content-Type", "text/html")
+
+			rssFeed := feeds.GenerateRssFeed()
+			rssFeedBytes, err := xml.Marshal(rssFeed)
+			if err != nil {
+				return c.Status(http.StatusInternalServerError).SendString("Failed to marshal RSS feed")
+			}
+			return c.Send(rssFeedBytes)
 		})
 
-		semiInvalid.GET("/atom/as-rss", func(c *gin.Context) {
-			c.Header("Content-Type", "application/rss+xml")
-			c.XML(http.StatusOK, feeds.GenerateAtomFeed())
+		semiInvalid.Get("/atom/as-rss", func(c *fiber.Ctx) error {
+			c.Set("Content-Type", "application/rss+xml")
+			atomFeed := feeds.GenerateAtomFeed()
+			atomFeedBytes, err := xml.Marshal(atomFeed)
+			if err != nil {
+				return c.Status(http.StatusInternalServerError).SendString("Failed to marshal Atom feed")
+			}
+			return c.Send(atomFeedBytes)
 		})
 	}
 
-	invalid := r.Group("/invalid")
+	invalid := app.Group("/invalid")
 	{
-		invalid.GET("/rss/returns-html", func(c *gin.Context) {
-			c.Header("Content-Type", "application/rss+xml")
+		invalid.Get("/rss/returns-html", func(c *fiber.Ctx) error {
+			c.Set("Content-Type", "application/rss+xml")
 
-			c.HTML(http.StatusOK, "index.tmpl", gin.H{})
+			return c.Render("index", fiber.Map{})
 		})
 
-		invalid.GET("/rss/invalid-syntax", func(c *gin.Context) {
+		invalid.Get("/rss/invalid-syntax", func(c *fiber.Ctx) error {
 			content, err := os.ReadFile("templates/invalid_rss.xml")
 			if err != nil {
-				c.String(http.StatusInternalServerError, "Error reading file")
-				return
+				return c.Status(http.StatusInternalServerError).SendString("Error reading file")
 			}
 
-			c.Header("Content-Type", "application/rss+xml")
-			c.String(http.StatusOK, string(content))
+			c.Set("Content-Type", "application/rss+xml")
+			return c.SendString(string(content))
 		})
 	}
 
-	redirects := r.Group("/redirects")
+	redirects := app.Group("/redirects")
 	{
-		redirects.GET("/rss/valid", func(c *gin.Context) {
+		redirects.Get("/rss/valid", func(c *fiber.Ctx) error {
 			time.Sleep(1 * time.Second)
 
-			c.Redirect(http.StatusTemporaryRedirect, "/valid/rss")
+			return c.Redirect("/valid/rss", http.StatusTemporaryRedirect)
 		})
 
-		redirects.GET("/multiple", func(c *gin.Context) {
+		redirects.Get("/multiple", func(c *fiber.Ctx) error {
 			time.Sleep(1 * time.Second)
 
-			c.Redirect(http.StatusTemporaryRedirect, "/redirects/rss/valid")
+			return c.Redirect("/redirects/rss/valid", http.StatusTemporaryRedirect)
 		})
 
-		redirects.GET("/https/to/http", func(c *gin.Context) {
+		redirects.Get("/https/to/http", func(c *fiber.Ctx) error {
 			time.Sleep(1 * time.Second)
 
-			c.Redirect(http.StatusTemporaryRedirect, "http://127.0.0.1:8080/valid/rss")
+			return c.Redirect("http://127.0.0.1:8080/valid/rss", http.StatusTemporaryRedirect)
 		})
 
-		redirects.GET("/http/to/https", func(c *gin.Context) {
+		redirects.Get("/http/to/https", func(c *fiber.Ctx) error {
 			time.Sleep(1 * time.Second)
 
-			c.Redirect(http.StatusTemporaryRedirect, "https://127.0.0.1:8443/valid/rss")
+			return c.Redirect("https://127.0.0.1:8443/valid/rss", http.StatusTemporaryRedirect)
 		})
 	}
 
-	// Random endpoint
+	// // Random endpoint
 	// This endpoint will randomly select one of the defined endpoints and exectutes it (without redirecting)
-	r.GET("/random", func(c *gin.Context) {
+	app.Get("/random", func(c *fiber.Ctx) error {
 		var endpoints []string
-		for _, route := range r.Routes() {
-			endpoints = append(endpoints, route.Path)
+		for _, routes := range app.Stack() {
+			for _, route := range routes {
+				endpoints = append(endpoints, route.Path)
+			}
 		}
 
 		randomEndpoint := endpoints[time.Now().UnixNano()%int64(len(endpoints))]
-		c.Request.URL.Path = randomEndpoint
-		r.HandleContext(c)
+		c.Path(randomEndpoint)
+		return c.Next()
 	})
 
 	go func() {
-		err_http := http.ListenAndServe(":8080", r)
+		err_http := app.Listen(":8080")
 		if err_http != nil {
 			log.Fatal("Web server (HTTP): ", err_http)
 		}
 	}()
 
-	err := r.RunTLS(":8443", "cert.pem", "key.pem")
+	err := app.ListenTLS(":8443", "cert.pem", "key.pem")
 	if err != nil {
 		log.Fatalf("Failed to run server: %v", err)
 	}
